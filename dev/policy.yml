@@ -1,0 +1,17 @@
+- !policy
+  id: conjur/authn-iam/global
+  body:
+  - !webservice
+  - !group apps
+  - !permit
+    role: !group apps
+    resource: !webservice
+    privileges: [ read, authenticate ]
+
+# an example of a host that will authenticate using an IAM role
+- &iamhosts
+  - !host team1/622705945757/ubuntu-client-conjur-identity
+
+- !grant
+  role: !group conjur/authn-iam/global/apps
+  members: *iamhosts
