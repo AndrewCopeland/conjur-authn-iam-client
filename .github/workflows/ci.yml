@@ -10,11 +10,11 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v2
       - name: Lint pkg dir
-        uses: Jerome1337/golint-action:v1.0.2
+        uses: Jerome1337/golint-action@v1.0.2
         with:
           golint-path: './pkg/...'
       - name: Lint cmd dir
-        uses: Jerome1337/golint-action:v1.0.2
+        uses: Jerome1337/golint-action@v1.0.2
         with:
           golint-path: './cmd/...'
   
