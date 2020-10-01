@@ -85,7 +85,7 @@ jobs:
           username: andrewcopeland
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
-          repository: AndrewCopeland/conjur-authn-iam-client/authenticator
+          repository: andrewcopeland/conjur-authn-iam-client/authenticator
           tags: dev-${{ steps.date.outputs.date }}
         env:
           DOCKERHUB_USERNAME: andrewcopeland
