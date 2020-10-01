@@ -45,13 +45,13 @@ jobs:
         run: mkdir -p bin
       - name: Build x64 Linux Executable
         run: |
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./bin/linux_authenticator ./cmd/
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./bin/linux_authenticator ./cmd/authenticator/
       - name: Build x64 MacOS Executable
         run: |
-          CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o ./bin/darwin_authenticator ./cmd/
+          CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o ./bin/darwin_authenticator ./cmd/authenticator/
       - name: Build x64 Windows Executable
         run: |
-          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o ./bin/windows_authenticator.exe ./cmd/
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o ./bin/windows_authenticator.exe ./cmd/authenticator/
       - name: Upload Artifacts to Workflow
         uses: actions/upload-artifact@v2
         with:
