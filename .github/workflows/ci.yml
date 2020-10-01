@@ -28,6 +28,7 @@ jobs:
         run: go test -v ./... > gotest_results_${GITHUB_RUN_ID}.log
       - name: Upload Results to Workflow
         uses: actions/upload-artifact@v2
+        if: always()
         with:
           name: Go Test Logs
           path: |
