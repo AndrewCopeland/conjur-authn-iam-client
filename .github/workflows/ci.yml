@@ -71,21 +71,21 @@ jobs:
           docker save andrewcopeland/authenticator:$TAG_NAME > ./bin/docker_authenticator.tar
         env:
           TAG_NAME: dev-${{ steps.date.outputs.date }}
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
+      - name: Build and Push Docker Container to DockerHub
+        uses: docker/build-push-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and Push Docker Container to DockerHub
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          tags: andrewcopeland/authenticator:dev-${{ steps.date.outputs.date }}
+          repository: andrewcopeland/authenticator
+          tags: dev-${{ steps.date.outputs.date }}
       - name: Build and Push Docker Container to GitHub Packages
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v1
         with:
-          push: true
-          tags: docker.pkg.github.com/AndrewCopeland/conjur-authn-iam-client/authenticator:dev-${{ steps.date.outputs.date }}
+          username: andrewcopeland
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: AndrewCopeland/conjur-authn-iam-client/authenticator
+          tags: dev-${{ steps.date.outputs.date }}
         env:
           DOCKERHUB_USERNAME: andrewcopeland
           DOCKERHUB_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
