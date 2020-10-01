@@ -1,6 +1,8 @@
 # conjur-authn-iam-client
 Authenticate AWS resources (EC2, Lambda, ECS) with Conjur and easily retrieve secrets.
 
+[![conjur-authn-iam-client CI](https://github.com/AndrewCopeland/conjur-authn-iam-client/workflows/conjur-authn-iam-client%20CI/badge.svg)](https://github.com/AndrewCopeland/conjur-authn-iam-client/actions?query=workflow%3A%22conjur-authn-iam-client+CI%22)
+
 ## Certification level
 ![](https://img.shields.io/badge/Certification%20Level-Community-28A745?link=https://github.com/cyberark/community/blob/master/Conjur/conventions/certification-levels.md)
 
