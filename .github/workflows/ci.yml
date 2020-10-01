@@ -10,14 +10,12 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2
-      # - name: Lint pkg dir
-      #   uses: Jerome1337/golint-action@v1.0.2
-      #   with:
-      #     golint-path: './pkg/...'
-      - name: Lint cmd dir
-        uses: Jerome1337/golint-action@v1.0.2
+      - name: Setup go version 1.15
+        uses: actions/setup-go@v2
         with:
-          golint-path: './cmd/...'
+          go-version: '^1.15'
+      - name: Lint All
+        run: golint ./... > golint_results_${GITHUB_RUN_ID}.log
   
   test:
     name: Unit Tests
@@ -27,7 +25,13 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v2
       - name: Run go test
-        run: go test -v ./...
+        run: go test -v ./... > gotest_results_${GITHUB_RUN_ID}.log
+      - name: Upload Results to Workflow
+        uses: actions/upload-artifact@v2
+        with:
+          name: Go Test Logs
+          path: |
+            *_results_*.log
 
   build:
     name: Build Release Executables
@@ -45,6 +49,9 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: '^1.15'
+      - name: Get current date & time
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d_%H%M%S')"
       - name: Export GO111MODULE environment variable
         run: export GO111MODULE=on
       - name: Create ./bin/ directory
@@ -58,6 +65,30 @@ jobs:
       - name: Build x64 Windows Executable
         run: |
           CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o ./bin/windows_authenticator.exe ./cmd/authenticator/
+      - name: Build Docker Container Package
+        run: |
+          docker build -t andrewcopeland/authenticator:$TAG_NAME .
+          docker save andrewcopeland/authenticator:$TAG_NAME > ./bin/docker_authenticator.tar
+        env:
+          TAG_NAME: dev-${{ steps.date.outputs.date }}
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and Push Docker Container to DockerHub
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: andrewcopeland/authenticator:dev-${{ steps.date.outputs.date }}
+      - name: Build and Push Docker Container to GitHub Packages
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: docker.pkg.github.com/andrewcopeland/conjur-authn-iam-client/authenticator:dev-${{ steps.date.outputs.date }}
+        env:
+          DOCKERHUB_USERNAME: andrewcopeland
+          DOCKERHUB_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload Artifacts to Workflow
         uses: actions/upload-artifact@v2
         with:
