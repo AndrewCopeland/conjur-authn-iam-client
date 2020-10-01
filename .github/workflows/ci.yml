@@ -18,21 +18,21 @@ jobs:
         with:
           golint-path: './cmd/...'
   
-  test:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v2
-      - name: Run go test
-        run: go test -v ./...
+  # test:
+  #   name: Unit Tests
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout source code
+  #       uses: actions/checkout@v2
+  #     - name: Run go test
+  #       run: go test -v ./...
 
   build:
     name: Build Release Executables
     runs-on: ubuntu-latest
     needs:
       - lint
-      - test
+      # - test
     defaults:
       run:
         shell: bash
