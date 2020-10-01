@@ -1,4 +1,4 @@
-module github.com/andrewcopeland/conjur-authn-iam-client
+module github.com/AndrewCopeland/conjur-authn-iam-client
 
 go 1.15
 
