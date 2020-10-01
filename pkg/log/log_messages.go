@@ -23,6 +23,8 @@ const CAIC008E string = "CAIC008E Failure to load Conjur config. %s"
 const CAIC009E string = "CAIC009E Error getting the Conjur login environment variable '%s' or flag '-%s'"
 const CAIC010E string = "CAIC010E Failed to write access token to '%s'. %s"
 const CAIC011E string = "CAIC011E Failed to retrieve secret '%s'. %s"
+const CAIC012E string = "CAIC012E Error getting the Conjur account environment variables '%s' or flag '-%s'"
+const CAIC013E string = "CAIC012E Error getting the Conjur appliance URL environment variables '%s' or flag '-%s'"
 
 // INFO MESSAGES
 const CAIC001I string = "CAIC001I Retrieving AWS IAM credential for resource type '%s'"
