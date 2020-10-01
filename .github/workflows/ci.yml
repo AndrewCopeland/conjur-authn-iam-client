@@ -39,17 +39,16 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2
-      - name: Export GO111MODULE environment variable
-        run: export GO111MODULE=on
-      - name: Create ./bin/ directory
-        run: mkdir -p bin
       - name: Setup go version 1.15
         uses: actions/setup-go@v2
         with:
           go-version: '^1.15'
+      - name: Export GO111MODULE environment variable
+        run: export GO111MODULE=on
+      - name: Create ./bin/ directory
+        run: mkdir -p bin
       - name: Build x64 Linux Executable
         run: |
-          go get -d ./...
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./bin/linux_authenticator ./cmd/authenticator/
       - name: Build x64 MacOS Executable
         run: |
