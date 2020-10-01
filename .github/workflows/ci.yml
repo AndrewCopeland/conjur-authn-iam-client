@@ -85,7 +85,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: docker.pkg.github.com/andrewcopeland/conjur-authn-iam-client/authenticator:dev-${{ steps.date.outputs.date }}
+          tags: docker.pkg.github.com/AndrewCopeland/conjur-authn-iam-client/authenticator:dev-${{ steps.date.outputs.date }}
         env:
           DOCKERHUB_USERNAME: andrewcopeland
           DOCKERHUB_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
