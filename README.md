@@ -42,7 +42,7 @@ Usage of ./authenticator:
 ```
 
 ### EC2
-Download the binary onto your EC2 instance from [here](path/to/Releases) and execute the following command:
+Download the binary onto your EC2 instance from [here](https://github.com/AndrewCopeland/conjur-authn-iam-client/releases) and execute the following command:
 ```
 $ ./authenticator -aws-name ec2 -login host/622705945757/ubuntu-client-conjur-identity -authn-url https://conjur-master/authn-iam/global 
 INFO:  2020/09/30 18:44:11.738289 main.go:41: CAIC001I Retrieving AWS IAM credential for resource type 'ec2'
