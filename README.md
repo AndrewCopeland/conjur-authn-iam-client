@@ -21,10 +21,14 @@ by CyberArk**. For more detailed information on our certification levels, see [o
 ```
 $ ./authenticator -h
 Usage of ./authenticator:
+  -account string
+    	The account Conjur has been configued with
   -authn-url string
     	URL Conjur will be authenticating to. Environment variable equivalent 'CONJUR_AUTHN_URL'. e.g. https://conjur.com/authn-iam/global
   -aws-name string
     	AWS Resource type name. Environment variable equivalent 'CONJUR_AWS_TYPE'. e.g. ec2, lambda, ecs
+  -ignore-ssl-verify
+    	WARNING: Do not verify the SSL certificate provided by Conjur server. THIS SHOULD ONLY BE USED FOR POC
   -login string
     	Conjur login that will be used. Environment variable equivalent 'CONJUR_AUTHN_LOGIN'. e.g. host/6634674884744/iam-role-name
   -secret string
@@ -33,6 +37,8 @@ Usage of ./authenticator:
     	Silence debug and info messages
   -token-path string
     	Write the access token to this file. Environment variable equivalent 'CONJUR_ACCESS_TOKEN_PATH'. e.g. /path/to/access-token.json
+  -url string
+    	The URL to the Conjur instance. e.g. https://conjur.com
 ```
 
 ### EC2
