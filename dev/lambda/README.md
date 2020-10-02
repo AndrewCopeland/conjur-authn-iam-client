@@ -9,7 +9,7 @@ The following environment variables are mandatory:
 - `CONJUR_AUTHN_URL`: The conjur authentication URL. e.g. https://conjur.company.com/authn-iam/global
 
 
-The sample lambda code is below:
+The sample lambda code is below. We are authenticating to Conjur and listing all of the resource this identity has access to
 ```go
 package main
 
