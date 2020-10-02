@@ -41,6 +41,37 @@ Usage of ./authenticator:
     	The URL to the Conjur instance. e.g. https://conjur.com
 ```
 
+### Examples
+#### Get Conjur Access Token
+```
+./authenticator -aws-name ec2 \
+    -account conjur \
+    -url https://conjur-master \
+    -authn-url https://conjur-master/authn-iam/global \
+    -login host/team1/622705945757/ubuntu-client-conjur-identity
+```
+
+#### Get Secret
+```
+./authenticator -aws-name ec2 \
+    -account conjur \
+    -url https://conjur-master \
+    -authn-url https://conjur-master/authn-iam/global \
+    -login host/team1/622705945757/ubuntu-client-conjur-identity \
+    -secret path/to/secret
+    -silence
+```
+
+#### Write Conjur Access Token to file
+```
+./authenticator -aws-name ec2 \
+    -account conjur \
+    -url https://conjur-master \
+    -authn-url https://conjur-master/authn-iam/global \
+    -login host/team1/622705945757/ubuntu-client-conjur-identity
+    -token-path /path/conjur/access.json
+```
+
 ### EC2
 More information about [authenticating EC2 instances](docs/ec2/README.md)
 
