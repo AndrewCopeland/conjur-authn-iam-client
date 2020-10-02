@@ -31,8 +31,8 @@ func GetConjurAccessToken(config Config) ([]byte, error) {
 	log.Info(log.CAIC003I)
 
 	// Use the Authentication request to authenticate to Conjur and get a Conjur access token
-	log.Info(log.CAIC004I, config.AuthnURL, config.Login, config.Config.Account)
-	accessToken, err := Authenticate(config.AuthnURL, config.Login, conjurAuthnRequest, config.Config)
+	log.Info(log.CAIC004I, config.AuthnURL, config.Login, config.Account)
+	accessToken, err := Authenticate(config.AuthnURL, config.Account, config.Login, conjurAuthnRequest, config.IgnoreSSLVerify)
 	if err != nil {
 		return nil, log.RecordedError(log.CAIC007E, err)
 	}
@@ -41,6 +41,7 @@ func GetConjurAccessToken(config Config) ([]byte, error) {
 	return accessToken, nil
 }
 
+// WriteAccessToken witll write Conjur access token to a file specified
 func WriteAccessToken(accessToken []byte, tokenPath string) error {
 	if tokenPath == "" {
 		return nil

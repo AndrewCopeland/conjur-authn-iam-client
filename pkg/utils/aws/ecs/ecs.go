@@ -53,7 +53,6 @@ func (r ECS) GetCredential() (aws.Credential, error) {
 	}
 
 	return cred, nil
-
 }
 
 // New ECS resource
