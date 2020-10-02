@@ -29,8 +29,8 @@ const (
 	FlagIgnoreSSLVerify = "ignore-ssl-verify"
 
 	DescriptionAwsType         = "AWS Resource type name. Environment variable equivalent '" + ConjurAwsType + "'. e.g. ec2, lambda, ecs"
-	DescriptionAccount         = "The account Conjur has been configued with"
-	DescriptionApplianceUrl    = "The URL to the Conjur instance. e.g. https://conjur.com"
+	DescriptionAccount         = "The Conjur account. Environment variable equivalent '" + ConjurAccount + "'. e.g. company, etc"
+	DescriptionApplianceUrl    = "The URL to the Conjur instance. Environment variable equivalent '" + ConjurApplianceUrl + "'. e.g. https://conjur.com"
 	DescriptionLogin           = "Conjur login that will be used. Environment variable equivalent '" + ConjurAuthnLogin + "'. e.g. host/6634674884744/iam-role-name"
 	DescriptionAuthnUrl        = "URL Conjur will be authenticating to. Environment variable equivalent '" + ConjurAuthnUrl + "'. e.g. https://conjur.com/authn-iam/global"
 	DescriptionTokenPath       = "Write the access token to this file. Environment variable equivalent '" + ConjurAccessTokenPath + "'. e.g. /path/to/access-token.json"
@@ -54,6 +54,10 @@ type Config struct {
 	AccessTokenPath string
 	SecretID        string
 	Silence         bool
+}
+
+func (c Config) Log() {
+	log.Info("AWS-Type: %s; Account: %s; Appliance URL: %s; Login: %s; Authn URL: %s; Ignore SSL Verify: %v; Access Token Path: %s; Service ID: %s; Silence: %v", c.AWSName, c.Account, c.ApplianceURL, c.Login, c.AuthnURL, c.IgnoreSSLVerify, c.AccessTokenPath, c.Silence)
 }
 
 // Will default to using environment variables if flag is not provided.
@@ -85,11 +89,11 @@ func GetConfig() (Config, error) {
 	}
 
 	if *account == "" {
-		return Config{}, log.RecordedError(log.CAIC011E, ConjurAccount, FlagAccount)
+		return Config{}, log.RecordedError(log.CAIC012E, ConjurAccount, FlagAccount)
 	}
 
 	if *applianceURL == "" {
-		return Config{}, log.RecordedError(log.CAIC012E, ConjurApplianceUrl, FlagApplianceUrl)
+		return Config{}, log.RecordedError(log.CAIC013E, ConjurApplianceUrl, FlagApplianceUrl)
 	}
 
 	if *login == "" {
@@ -104,7 +108,7 @@ func GetConfig() (Config, error) {
 		log.EnableSilence()
 	}
 
-	return Config{
+	config := Config{
 		AWSName:         *awsName,
 		Account:         *account,
 		ApplianceURL:    *applianceURL,
@@ -114,5 +118,7 @@ func GetConfig() (Config, error) {
 		SecretID:        *secretID,
 		Silence:         *silence,
 		IgnoreSSLVerify: *ignoreSSLVerify,
-	}, nil
+	}
+	config.Log()
+	return config, nil
 }
