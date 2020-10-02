@@ -1,0 +1,99 @@
+name: conjur-authn-iam-client CI
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+      - name: Setup go version 1.15
+        uses: actions/setup-go@v2
+        with:
+          go-version: '^1.15'
+      - name: Lint All
+        run: golint ./... > golint_results_${GITHUB_RUN_ID}.log
+  
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+      - name: Run go test
+        run: go test -v ./... > gotest_results_${GITHUB_RUN_ID}.log
+      - name: Upload Results to Workflow
+        uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: Go Test Logs
+          path: |
+            *_results_*.log
+
+  build:
+    name: Build Release Executables
+    runs-on: ubuntu-latest
+    needs:
+      - lint
+      - test
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+      - name: Setup go version 1.15
+        uses: actions/setup-go@v2
+        with:
+          go-version: '^1.15'
+      - name: Get current date & time
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d_%H%M%S')"
+      - name: Export GO111MODULE environment variable
+        run: export GO111MODULE=on
+      - name: Create ./bin/ directory
+        run: mkdir -p bin
+      - name: Build x64 Linux Executable
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./bin/linux_authenticator ./cmd/authenticator/
+      - name: Build x64 MacOS Executable
+        run: |
+          CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o ./bin/darwin_authenticator ./cmd/authenticator/
+      - name: Build x64 Windows Executable
+        run: |
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o ./bin/windows_authenticator.exe ./cmd/authenticator/
+      - name: Build Docker Container Package
+        run: |
+          docker build -t andrewcopeland/authenticator:$TAG_NAME .
+          docker save andrewcopeland/authenticator:$TAG_NAME > ./bin/docker_authenticator.tar
+        env:
+          TAG_NAME: dev-${{ steps.date.outputs.date }}
+      - name: Build and Push Docker Container to DockerHub
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: andrewcopeland/authenticator
+          tags: dev-${{ steps.date.outputs.date }}
+      - name: Build and Push Docker Container to GitHub Packages
+        uses: docker/build-push-action@v1
+        with:
+          username: andrewcopeland
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: andrewcopeland/conjur-authn-iam-client/authenticator
+          tags: dev-${{ steps.date.outputs.date }}
+        env:
+          DOCKERHUB_USERNAME: andrewcopeland
+          DOCKERHUB_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Artifacts to Workflow
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: Release Executables
+          path: |
+            ./bin/*_authenticator*
