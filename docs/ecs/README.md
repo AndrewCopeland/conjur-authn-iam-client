@@ -4,7 +4,7 @@ To Setup the Conjur `authn-iam` authenticator with ECS or Fargate follow the fol
 1. Retrieve the latest authenticator image from [docker hub](https://hub.docker.com/r/andrewcopeland/authenticator)
 2. When defining your `Task Definition` use the image in the above link.
 3. Define a Volume, this is where the Conjur access token can be written to and shared with other containers that require secrets from Conjur.
-4. Define the following environment variables in your `Task Definition` (These environment variables can be overridden however these values typicallu tend to be static)
+4. Define the following environment variables in your `Task Definition` (These environment variables can be overridden however these values typically tend to be static)
   - `CONJUR_ACCESS_TOKEN_PATH`: <path to volume mount>/access.json
   - `CONJUR_ACCOUNT`: company
   - `CONJUR_APPLIANCE_URL`: https://conjur.company.local
