@@ -11,9 +11,9 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v2
       - name: Lint All
-        run: |
-          go get -u golang.org/x/lint/golint
-          golint ./... > golint_results_${GITHUB_RUN_ID}.log
+        uses: Jerome1337/golint-action@v1.0.2
+        with:
+          golint-path: './...'
   
   test:
     name: Unit Tests
