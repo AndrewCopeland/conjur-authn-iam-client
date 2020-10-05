@@ -22,7 +22,7 @@ by CyberArk**. For more detailed information on our certification levels, see [o
 $ ./authenticator -h
 Usage of ./authenticator:
   -account string
-    	The account Conjur has been configued with
+    	The Conjur account. Environment variable equivalent 'CONJUR_ACCOUNT'. e.g. company, etc
   -authn-url string
     	URL Conjur will be authenticating to. Environment variable equivalent 'CONJUR_AUTHN_URL'. e.g. https://conjur.com/authn-iam/global
   -aws-name string
@@ -38,7 +38,7 @@ Usage of ./authenticator:
   -token-path string
     	Write the access token to this file. Environment variable equivalent 'CONJUR_ACCESS_TOKEN_PATH'. e.g. /path/to/access-token.json
   -url string
-    	The URL to the Conjur instance. e.g. https://conjur.com
+    	The URL to the Conjur instance. Environment variable equivalent 'CONJUR_APPLIANCE_URL'. e.g. https://conjur.com
 ```
 
 ### Examples
