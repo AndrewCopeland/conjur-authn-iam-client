@@ -41,6 +41,10 @@ jobs:
     defaults:
       run:
         shell: bash
+    strategy:
+      matrix:
+        goos: [linux, darwin, windows]
+        goarch: [amd64]
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2
@@ -55,15 +59,9 @@ jobs:
         run: export GO111MODULE=on
       - name: Create ./bin/ directory
         run: mkdir -p bin
-      - name: Build x64 Linux Executable
+      - name: Build Binaries
         run: |
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./bin/linux_authenticator ./cmd/authenticator/
-      - name: Build x64 MacOS Executable
-        run: |
-          CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o ./bin/darwin_authenticator ./cmd/authenticator/
-      - name: Build x64 Windows Executable
-        run: |
-          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o ./bin/windows_authenticator.exe ./cmd/authenticator/
+          CGO_ENABLED=0 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o ./bin/${{ matrix.goos }}_authenticator ./cmd/authenticator/
       - name: Build Docker Container Package
         run: |
           docker build -t andrewcopeland/authenticator:$TAG_NAME .
