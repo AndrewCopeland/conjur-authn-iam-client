@@ -2,7 +2,7 @@ name: conjur-authn-iam-client CD
 
 on:
   release:
-    types: [published, prereleased]
+    types: [published]
 
 jobs:
   release:
