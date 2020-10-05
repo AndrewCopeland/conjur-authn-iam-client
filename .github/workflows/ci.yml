@@ -10,12 +10,10 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2
-      - name: Setup go version 1.15
-        uses: actions/setup-go@v2
-        with:
-          go-version: '^1.15'
       - name: Lint All
-        run: golint ./... > golint_results_${GITHUB_RUN_ID}.log
+        uses: Jerome1337/golint-action@v1.0.2
+        with:
+          golint-path: './...'
   
   test:
     name: Unit Tests
