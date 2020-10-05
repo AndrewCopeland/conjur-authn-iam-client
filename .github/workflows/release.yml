@@ -1,0 +1,41 @@
+name: conjur-authn-iam-client CD
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  release:
+    name: Release Executables
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux, darwin, windows]
+        goarch: [amd64]
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v2
+    - name: Read version from release.json
+      uses: notiz-dev/github-action-json-property@release
+      id: client_version
+      with:
+        path: 'release.json'
+        prop_path: 'version'
+
+    - name: Read go_version from release.json
+      uses: notiz-dev/github-action-json-property@release
+      id: go_version
+      with:
+        path: 'release.json'
+        prop_path: 'go_version'
+
+    - name: Build client binary
+      uses: wangyoucao577/go-release-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        goos: ${{ matrix.goos }}
+        goarch: ${{ matrix.goarch }}
+        goversion: "https://dl.google.com/go/go${{ steps.go_version.outputs.prop }}.linux-amd64.tar.gz"
+        project_path: "./cmd/authenticator"
+        binary_name: "${{ matrix.goos }}_authenticator"
+        extra_files: LICENSE README.md CHANGELOG.md CONTRIBUTING.md SECURITY.md
