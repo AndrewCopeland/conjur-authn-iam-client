@@ -5,11 +5,11 @@ To Setup the Conjur `authn-iam` authenticator with ECS or Fargate follow the fol
 2. When defining your `Task Definition` use the image in the above link.
 3. Define a Volume, this is where the Conjur access token can be written to and shared with other containers that require secrets from Conjur.
 4. Define the following environment variables in your `Task Definition` (These environment variables can be overridden however these values typicallu tend to be static)
-  - CONJUR_ACCESS_TOKEN_PATH: <path to volume mount>/access.json
-  - CONJUR_ACCOUNT: company
-  - CONJUR_APPLIANCE_URL: https://conjur.company.local
-  - CONJUR_AUTHN_URL: https://conjur.company.local/authn-iam/prod
-  - CONJUR_AWS_TYPE: ecs
+  - `CONJUR_ACCESS_TOKEN_PATH`: <path to volume mount>/access.json
+  - `CONJUR_ACCOUNT`: company
+  - `CONJUR_APPLIANCE_URL`: https://conjur.company.local
+  - `CONJUR_AUTHN_URL`: https://conjur.company.local/authn-iam/prod
+  - `CONJUR_AWS_TYPE`: ecs
 5. Then `Run a New Task` and select the `Task Definition` we defined in the previous steps.
 6. Select `Advanced Option` -> `Add Environment Variables` and add environment variable called `CONJUR_AUTHN_LOGIN` this is the ID of the application. e.g. `host/7363673737363/iam-role-name`
 9. Share the volume mount with the containers that require a Conjur Access Token to retrieve secrets.
