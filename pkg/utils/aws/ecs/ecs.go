@@ -21,7 +21,7 @@ func (r ECS) getCredentialURL() (string, error) {
 	if relativeURI == "" {
 		return "", fmt.Errorf("Failed to get relative uri from environment variable '%s'", r.AwsCredentialRelativeURI)
 	}
-	return fmt.Sprintf("%s%s", r.MetadataIP, relativeURI), nil
+	return fmt.Sprintf("http://%s%s", r.MetadataIP, relativeURI), nil
 }
 
 // Name of aws resource
