@@ -25,6 +25,7 @@ const CAIC010E string = "CAIC010E Failed to write access token to '%s'. %s"
 const CAIC011E string = "CAIC011E Failed to retrieve secret '%s'. %s"
 const CAIC012E string = "CAIC012E Error getting the Conjur account environment variables '%s' or flag '-%s'"
 const CAIC013E string = "CAIC012E Error getting the Conjur appliance URL environment variables '%s' or flag '-%s'"
+const CAIC014E string = "CAIC014E Failed to get certificate from environment variable or file. %s"
 
 // INFO MESSAGES
 const CAIC001I string = "CAIC001I Retrieving AWS IAM credential for resource type '%s'"
@@ -34,6 +35,8 @@ const CAIC004I string = "CAIC004I Attempting to authenticate to conjur: authnUrl
 const CAIC005I string = "CAIC005I Attempting to authenticate to conjur '%s'"
 const CAIC006I string = "CAIC006I Successfully authenticated to conjur with login '%s'"
 const CAIC007I string = "CAIC007I Successfully wrote access token to '%s'"
+const CAIC008I string = "CAIC008I Retrying authentication for the '%v' time"
+const CAIC009I string = "CAIC009I Waiting for '%s' seconds"
 
 // DEBUG MESSAGES
 const CAIC001D string = "CAIC001D Debug mode is enabled"
