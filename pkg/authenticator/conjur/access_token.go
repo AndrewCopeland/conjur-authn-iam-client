@@ -32,7 +32,11 @@ func GetConjurAccessToken(config Config) ([]byte, error) {
 
 	// Use the Authentication request to authenticate to Conjur and get a Conjur access token
 	log.Info(log.CAIC004I, config.AuthnURL, config.Login, config.Account)
-	accessToken, err := Authenticate(config.AuthnURL, config.Account, config.Login, conjurAuthnRequest, config.IgnoreSSLVerify)
+	cert, err := config.getCertificate()
+	if err != nil {
+		return nil, log.RecordedError(log.CAIC014E, err)
+	}
+	accessToken, err := Authenticate(config.AuthnURL, config.Account, config.Login, conjurAuthnRequest, config.IgnoreSSLVerify, cert)
 	if err != nil {
 		return nil, log.RecordedError(log.CAIC007E, err)
 	}
