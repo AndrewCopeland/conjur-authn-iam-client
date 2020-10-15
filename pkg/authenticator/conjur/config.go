@@ -1,22 +1,28 @@
 package conjur
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"flag"
+	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/AndrewCopeland/conjur-authn-iam-client/pkg/log"
 )
 
 const (
-	ConjurAwsType          = "CONJUR_AWS_TYPE"
-	ConjurAccount          = "CONJUR_ACCOUNT"
-	ConjurApplianceUrl     = "CONJUR_APPLIANCE_URL"
-	ConjurAuthnUrl         = "CONJUR_AUTHN_URL"
-	ConjurAuthnLogin       = "CONJUR_AUTHN_LOGIN"
-	ConjurDontAuthenticate = "CONJUR_DONT_AUTHENTICATE"
-	ConjurAccessTokenPath  = "CONJUR_ACCESS_TOKEN_PATH"
-	ConjurIgnoreSSLVerify  = "CONJUR_IGNORE_SSL_VERIFY"
+	ConjurAwsType         = "CONJUR_AWS_TYPE"
+	ConjurAccount         = "CONJUR_ACCOUNT"
+	ConjurApplianceUrl    = "CONJUR_APPLIANCE_URL"
+	ConjurAuthnUrl        = "CONJUR_AUTHN_URL"
+	ConjurAuthnLogin      = "CONJUR_AUTHN_LOGIN"
+	ConjurAccessTokenPath = "CONJUR_ACCESS_TOKEN_PATH"
+	ConjurIgnoreSSLVerify = "CONJUR_IGNORE_SSL_VERIFY"
+	ConjurRefresh         = "CONJUR_REFRESH"
 
 	FlagAwsType         = "aws-name"
 	FlagAccount         = "account"
@@ -27,6 +33,7 @@ const (
 	FlagSecretID        = "secret"
 	FlagSilence         = "silence"
 	FlagIgnoreSSLVerify = "ignore-ssl-verify"
+	FlagRefresh         = "refresh"
 
 	DescriptionAwsType         = "AWS Resource type name. Environment variable equivalent '" + ConjurAwsType + "'. e.g. ec2, lambda, ecs"
 	DescriptionAccount         = "The Conjur account. Environment variable equivalent '" + ConjurAccount + "'. e.g. company, etc"
@@ -37,6 +44,7 @@ const (
 	DescriptionSecretID        = "Retrieve a specific secret from Conjur. e.g. db/postgres/username"
 	DescriptionSilence         = "Silence debug and info messages"
 	DescriptionIgnoreSSLVerify = "WARNING: Do not verify the SSL certificate provided by Conjur server. THIS SHOULD ONLY BE USED FOR POC"
+	DescriptionRefresh         = "Continously run and retrieve the Conjur access token every 6 min"
 )
 
 type Config struct {
@@ -46,18 +54,58 @@ type Config struct {
 	Login           string
 	AuthnURL        string
 	IgnoreSSLVerify bool
+	Certificate     string
+	CertificatePath string
 
 	// If AccessTokenPath & SecretID is not provided then print access token to stdout
 	// If only AccessTokenPath is provided then write access token to file
 	// If only SecretID is provided then print secret value to stdout
 	// If AccessTokenPath & SecretID is provided then write access token to file and print secret value to stdout
+	// FetchSeed will retrieve the seed from the master seed service and will write it to a file
 	AccessTokenPath string
 	SecretID        string
 	Silence         bool
+
+	// For retrying on failure, default is 5
+	Retry     int
+	RetryWait int64
+	Refresh   bool
 }
 
 func (c Config) Log() {
 	log.Info("AWS-Type: %s; Account: %s; Appliance URL: %s; Login: %s; Authn URL: %s; Ignore SSL Verify: %v; Access Token Path: %s; Service ID: %s; Silence: %v", c.AWSName, c.Account, c.ApplianceURL, c.Login, c.AuthnURL, c.IgnoreSSLVerify, c.AccessTokenPath, c.Silence)
+}
+
+func (c Config) getCertificate() ([]byte, error) {
+	if c.Certificate != "" {
+		return []byte(c.Certificate), nil
+	}
+
+	if c.CertificatePath != "" {
+		return ioutil.ReadFile(c.CertificatePath)
+	}
+	return nil, nil
+}
+
+func newHTTPSClient(ignoreSSLVerify bool, cert []byte) (*http.Client, error) {
+	// If not certificate provided do not create a certifictae pool
+	if cert == nil {
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: ignoreSSLVerify},
+		}
+		return &http.Client{Transport: tr, Timeout: time.Second * 10}, nil
+	}
+
+	// certificate is provided so create pool and append to TLSClientConfig
+	pool := x509.NewCertPool()
+	ok := pool.AppendCertsFromPEM(cert)
+	if !ok {
+		return nil, fmt.Errorf("Can't append Conjur SSL cert")
+	}
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{RootCAs: pool},
+	}
+	return &http.Client{Transport: tr, Timeout: time.Second * 10}, nil
 }
 
 // Will default to using environment variables if flag is not provided.
@@ -81,6 +129,14 @@ func GetConfig() (Config, error) {
 		ignoreDefault = true
 	}
 	ignoreSSLVerify := flag.Bool(FlagIgnoreSSLVerify, ignoreDefault, DescriptionIgnoreSSLVerify)
+
+	refreshStr := strings.ToLower(os.Getenv(ConjurRefresh))
+	refreshDefault := false
+	if refreshStr == "yes" || refreshStr == "true" {
+		refreshDefault = true
+	}
+	refresh := flag.Bool(FlagRefresh, refreshDefault, DescriptionRefresh)
+
 	flag.Parse()
 
 	// Validate mandatory config properties
@@ -118,6 +174,9 @@ func GetConfig() (Config, error) {
 		SecretID:        *secretID,
 		Silence:         *silence,
 		IgnoreSSLVerify: *ignoreSSLVerify,
+		Retry:           5,
+		RetryWait:       60,
+		Refresh:         *refresh,
 	}
 	config.Log()
 	return config, nil
