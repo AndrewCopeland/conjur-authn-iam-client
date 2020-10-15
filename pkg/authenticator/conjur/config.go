@@ -23,6 +23,8 @@ const (
 	ConjurAccessTokenPath = "CONJUR_ACCESS_TOKEN_PATH"
 	ConjurIgnoreSSLVerify = "CONJUR_IGNORE_SSL_VERIFY"
 	ConjurRefresh         = "CONJUR_REFRESH"
+	ConjurSSLCertificate  = "CONJUR_SSL_CERTIFICATE"
+	ConjurCertFile        = "CONJUR_CERT_FILE"
 
 	FlagAwsType         = "aws-name"
 	FlagAccount         = "account"
@@ -34,6 +36,7 @@ const (
 	FlagSilence         = "silence"
 	FlagIgnoreSSLVerify = "ignore-ssl-verify"
 	FlagRefresh         = "refresh"
+	FlagCertFile        = "cert-file"
 
 	DescriptionAwsType         = "AWS Resource type name. Environment variable equivalent '" + ConjurAwsType + "'. e.g. ec2, lambda, ecs"
 	DescriptionAccount         = "The Conjur account. Environment variable equivalent '" + ConjurAccount + "'. e.g. company, etc"
@@ -45,6 +48,7 @@ const (
 	DescriptionSilence         = "Silence debug and info messages"
 	DescriptionIgnoreSSLVerify = "WARNING: Do not verify the SSL certificate provided by Conjur server. THIS SHOULD ONLY BE USED FOR POC"
 	DescriptionRefresh         = "Continously run and retrieve the Conjur access token every 6 min"
+	DescriptionCertFile        = "The Conjur certificate chain file. Environment variable equivalent '" + ConjurCertFile + "'. e.g. /etc/conjur.pem"
 )
 
 type Config struct {
@@ -122,6 +126,7 @@ func GetConfig() (Config, error) {
 	tokenPath := flag.String(FlagTokenPath, os.Getenv(ConjurAccessTokenPath), DescriptionTokenPath)
 	secretID := flag.String(FlagSecretID, "", DescriptionSecretID)
 	silence := flag.Bool(FlagSilence, false, DescriptionSilence)
+	certFile := flag.String(FlagCertFile, os.Getenv(ConjurCertFile), DescriptionCertFile)
 
 	ignoreStr := strings.ToLower(os.Getenv(ConjurIgnoreSSLVerify))
 	ignoreDefault := false
@@ -177,6 +182,7 @@ func GetConfig() (Config, error) {
 		Retry:           5,
 		RetryWait:       60,
 		Refresh:         *refresh,
+		CertificatePath: *certFile,
 	}
 	config.Log()
 	return config, nil
